@@ -1,0 +1,106 @@
+{
+  "Description" : "Change to use cfn-init",
+
+  "Parameters": {
+    "EC2KeyPair": {
+      "Description": "Choose a keypair",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    }
+  },
+  "Resources": {
+     "EC2JenkinsMaster": {
+       "Type": "AWS::EC2::Instance",
+       "Metadata" : {
+         "AWS::CloudFormation::Init" : {
+           "configSets" : {
+             "CS1" : [ "1" ],
+             "CS2" : [ { "ConfigSet" : "CS1" }, "2" ],
+             "default" : [ { "ConfigSet" : "CS2" } ]
+           },  
+           "1" : {
+             "packages" : {
+               "yum" : { "java" : ["1.8.0-openjdk"] }
+             },
+             "commands" : {
+               "00-Jenkins Repo" : {
+                 "command" : "wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo\n",
+                 "cwd" : "~"
+               },
+               "01-Jenkins Repo" : {
+                 "command" : "rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key\n",
+                 "cwd" : "~"
+               }
+               "02-Remove Old Java" : {
+                 "command" : "yum remove -y java-1.7.0-openjdk\n",
+                 "cwd" : "~"
+               },
+               "03-Completer" : {
+                 "command" : "echo 'complete -C `which aws_completer` aws' >> /etc/bashrc\n",
+                 "cwd" : "~"
+               },
+             }
+           },
+
+
+           "2" : {
+             "packages" : {
+               "yum" : {
+                 "jenkins" : []
+               }
+             }
+           }
+  
+        }
+     },
+     "Properties": {
+        "IamInstanceProfile": "EC2SSMRole",
+        "ImageId": "ami-01419b804382064e4",
+        "InstanceType": "t2.micro",
+		"KeyName": { "Ref" : "EC2KeyPair" },
+        "SubnetId": { "Fn::ImportValue": "VPC-stack-SubnetB" },
+        "SecurityGroupIds": [
+          { "Fn::ImportValue": "VPC-stack-SG" }
+        ],
+		"Tags": [ 
+		  {
+ 		  "Key" : "Name",
+		  "Value" : "Jenkins Master v5"
+          },
+          {
+ 		  "Key" : "Environment",
+		  "Value" : "Development"
+		  }
+        ],
+
+
+      "UserData" : { "Fn::Base64" :
+        { "Fn::Join" : ["", [
+           "#!/bin/bash -xe\n",
+           "# Install the files and packages from the metadata\n",
+           "/opt/aws/bin/cfn-init -v ",
+           "         --stack ", { "Ref" : "AWS::StackName" },
+           "         --resource EC2JenkinsMaster ",
+           "         --region ", { "Ref" : "AWS::Region" }, "\n"
+          ]  ]}}
+      }
+    },
+
+
+
+
+
+
+
+    "MyEIP": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "InstanceId": { "Ref" : "EC2JenkinsMaster" }
+	  }
+    }
+
+
+
+
+
+  }
+}
