@@ -45,7 +45,14 @@
            "2" : {
              "packages" : {
                "yum" : {
-                 "jenkins" : []
+                 "jenkins" : [],
+                 "git" : [],
+                 "epel-release" : [],
+                 "python36" : [],
+                 "python36-pip" : [],
+                 "python36-devel" : [],
+                 "openssl": [],
+                 "docker": []
                }
              }
            }
@@ -54,7 +61,7 @@
      },
      "Properties": {
         "IamInstanceProfile": "EC2SSMRole",
-        "ImageId": "ami-01419b804382064e4",
+        "ImageId": "ami-05663d374a152d239",
         "InstanceType": "t2.micro",
 		"KeyName": { "Ref" : "EC2KeyPair" },
         "SubnetId": { "Fn::ImportValue": "VPC-stack-SubnetB" },
