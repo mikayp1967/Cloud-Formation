@@ -29,7 +29,7 @@
                "01-Jenkins Repo" : {
                  "command" : "rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key\n",
                  "cwd" : "~"
-               }
+               },
                "02-Remove Old Java" : {
                  "command" : "yum remove -y java-1.7.0-openjdk\n",
                  "cwd" : "~"
@@ -37,7 +37,7 @@
                "03-Completer" : {
                  "command" : "echo 'complete -C `which aws_completer` aws' >> /etc/bashrc\n",
                  "cwd" : "~"
-               },
+               }
              }
            },
 
@@ -64,7 +64,7 @@
 		"Tags": [ 
 		  {
  		  "Key" : "Name",
-		  "Value" : "Jenkins Master v5"
+		  "Value" : "Jenkins Master v6"
           },
           {
  		  "Key" : "Environment",
@@ -83,24 +83,7 @@
            "         --region ", { "Ref" : "AWS::Region" }, "\n"
           ]  ]}}
       }
-    },
-
-
-
-
-
-
-
-    "MyEIP": {
-      "Type": "AWS::EC2::EIP",
-      "Properties": {
-        "InstanceId": { "Ref" : "EC2JenkinsMaster" }
-	  }
     }
-
-
-
-
 
   }
 }
